@@ -1,0 +1,22 @@
+main: ru.mrflaxe.simplehomes.SimpleHomes
+name: {project.name}
+author: mrflaxe
+version: {project.version}
+api-version: 1.16
+depend: [SKLibrary]
+
+commands:
+  simplehomes:
+    aliases: [sh]
+    description: using the subcommands
+    usage: /sh
+  home:
+    description: teleporting to a home point
+    usgae: /home [name]
+  sethome:
+    description: sets a home point
+    usage: /sethome [name]
+  delhome:
+    description: deletes a home point
+    usage: /delhome [name]
+

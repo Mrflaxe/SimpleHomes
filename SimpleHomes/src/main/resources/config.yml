@@ -1,0 +1,17 @@
+database:
+  # Should plugin use SQLite database as data storage?
+  # Specify 'true' for SQLite or 'false' for MySQL
+  use-sqlite: true
+
+  # MySQL configuration
+  host: localhost
+  port: 3306
+  name: simplehomes
+  user: admin
+  password: simplehomes
+
+  # SQLite configuration
+  file: database.db
+
+homes:
+  max-name-size: 32
