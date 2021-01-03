@@ -26,9 +26,9 @@ public class DatabaseManager {
 	
 	// Добавление в БД точки дома
 	
-	public void createHome(String playerName, String name, String world, int x, int y, int z) {
+	public void createHome(String playerName, String name, String world, float yaw, float pitch, int x, int y, int z) {
 		try {
-			Home home = new Home(playerName, name, world, x, y, z);
+			Home home = new Home(playerName, name, world, yaw, pitch, x, y, z);
 			homeDao.create(home);
 		} catch (SQLException e) {
 			logger.severe("Failed to create the home data in database: " + e.getMessage());

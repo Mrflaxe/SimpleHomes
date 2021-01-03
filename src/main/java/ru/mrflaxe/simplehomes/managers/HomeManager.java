@@ -1,6 +1,9 @@
 package ru.mrflaxe.simplehomes.managers;
 
+import java.util.List;
+
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import ru.mrflaxe.simplehomes.database.DatabaseManager;
 import ru.mrflaxe.simplehomes.database.Home;
@@ -13,23 +16,36 @@ public class HomeManager {
 		this.dbManager = databaseManager;
 	}
 	
-	public int getHomeCount(String playerName) {
-		return dbManager.getHomesByPlayer(playerName).size();
+	public int getHomeCount(Player player) {
+		return dbManager.getHomesByPlayer(player.getName()).size();
 	}
 
-	public Home getFirstHome(String playerName) {
-		return dbManager.getHomesByPlayer(playerName).get(0);
+	public Home getFirstHome(Player player) {
+		return dbManager.getHomesByPlayer(player.getName()).get(0);
 	}
 	
-	public Home getHome(String playerName, String homeName) {
-		return dbManager.getHome(playerName, homeName);
+	public Home getHome(Player player, String homeName) {
+		return dbManager.getHome(player.getName(), homeName);
 	}
 	
-	public boolean isExist(String playerName, String homeName) {
-		return dbManager.getHome(playerName, homeName) != null;
+	public boolean isExist(Player player, String homeName) {
+		return dbManager.getHome(player.getName(), homeName) != null;
 	}
 	
-	public void createHome(String playerName, String name, Location location) {
-		dbManager.createHome(playerName, name, location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+	public void createHome(Player player, String name, Location location) {
+		dbManager.createHome(player.getName(), name, location.getWorld().getName(),
+		        location.getYaw(),
+		        location.getPitch(),
+		        location.getBlockX(),
+		        location.getBlockY(),
+		        location.getBlockZ());
+	}
+	
+	public void deleteHome(Player player, String name) {
+	    dbManager.deleteHome(player.getName(), name);
+	}
+	
+	public List<Home> getHomes(Player player) {
+	    return dbManager.getHomesByPlayer(player.getName());
 	}
 }

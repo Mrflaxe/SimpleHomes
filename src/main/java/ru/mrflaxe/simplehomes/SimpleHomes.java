@@ -2,8 +2,10 @@ package ru.mrflaxe.simplehomes;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import ru.mrflaxe.simplehomes.commands.CommandDelhome;
 import ru.mrflaxe.simplehomes.commands.CommandHome;
 import ru.mrflaxe.simplehomes.commands.CommandSethome;
+import ru.mrflaxe.simplehomes.commands.SubcommandHandler;
 import ru.mrflaxe.simplehomes.database.Database;
 import ru.mrflaxe.simplehomes.database.DatabaseManager;
 import ru.mrflaxe.simplehomes.managers.HomeManager;
@@ -46,7 +48,10 @@ public class SimpleHomes extends JavaPlugin {
 	}
 	
 	private void registerCommands() {
+	    new SubcommandHandler(this, messages);
+	    
 		new CommandHome(messages, homeManager).register(this);
 		new CommandSethome(messages, config, homeManager).register(this);
+		new CommandDelhome(messages, homeManager).register(this);
 	}
 }

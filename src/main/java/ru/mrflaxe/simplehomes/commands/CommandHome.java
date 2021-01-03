@@ -15,7 +15,7 @@ public class CommandHome extends PlayerOnlyCommand {
 	private final HomeManager homeManager;
 	
 	public CommandHome(Messages messages, HomeManager homeManager) {
-		super("home", "sh.command.home", messages);
+		super("home", "simplehomes.command.home", messages);
 		
 		this.messages = messages;
 		this.homeManager = homeManager;
@@ -24,16 +24,15 @@ public class CommandHome extends PlayerOnlyCommand {
 	@Override
 	protected void executeCommand(CommandSender sender, CommandArguments args) {
 		Player player = (Player) sender;
-		String name = sender.getName();
 		
 		if(args.size() == 0) {
-			if(homeManager.getHomeCount(name) == 0) {
+			if(homeManager.getHomeCount(player) == 0) {
 				messages.getAndSend(sender, "command.home.error.empty");
 				return;
 			}
 			
-			if(homeManager.getHomeCount(name) == 1) {
-				Home home = homeManager.getFirstHome(name);
+			if(homeManager.getHomeCount(player) == 1) {
+				Home home = homeManager.getFirstHome(player);
 				player.teleport(home.getLocation());
 				
 				messages.getAndSend(sender, "command.home.succes.by-first");
@@ -46,7 +45,7 @@ public class CommandHome extends PlayerOnlyCommand {
 		
 		String homeName = args.get(0);
 		
-		Home home = homeManager.getHome(name, homeName);
+		Home home = homeManager.getHome(player, homeName);
 		if(home == null) {
 			messages.getAndSend(sender, "command.home.error.not-exist");
 			return;

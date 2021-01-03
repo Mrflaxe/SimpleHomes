@@ -17,7 +17,7 @@ public class CommandSethome extends OmnipotentCommand {
 	private final HomeManager homeManager;
 	
 	public CommandSethome(Messages messages, Configuration config, HomeManager homeManager) {
-		super("sethome", null, "sh.command.sethome", 1, messages);
+		super("sethome", null, "simplehomes.command.sethome", 1, messages);
 		
 		this.messages = messages;
 		this.config = config;
@@ -26,13 +26,13 @@ public class CommandSethome extends OmnipotentCommand {
 
 	@Override
 	protected void executeCommand(CommandSender sender, CommandArguments args) {
-		String name = sender.getName();
 		Player player = (Player) sender;
 		
-		int homeCount = homeManager.getHomeCount(name);
+		// Can a player make more homes than he has now?
+		int homeCount = homeManager.getHomeCount(player);
 		int homeLimit = getHomesLimit(player);
 		if(homeCount >= homeLimit) {
-			messages.getAndSend(sender, "command.sethome.error.after-limit");
+			messages.getAndSend(sender, "command.sethome.error.limit-reached");
 			return;
 		}
 		
@@ -41,20 +41,21 @@ public class CommandSethome extends OmnipotentCommand {
 		int min = config.getInt("homes.min-name-size");
 		int max = config.getInt("homes.max-name-size");
 		
-		// Проверка на длину имени дома
+		// Checks for length of home name
 		if(length < min || length > max) {
 			String message = messages.getFormatted("command.sethome.error.out-of-bounds", "%min-count%", min, "%max-count%", max);
 			player.sendMessage(message);
 			return;
 		}
 		
-		// Существует ли уже этот дом у игрока
-		if(homeManager.isExist(name, homeName)) {
+		// Is already exist this home or not
+		if(homeManager.isExist(player, homeName)) {
 			messages.getAndSend(sender, "command.sethome.error.already-exist");
 			return;
 		}
 		
-		homeManager.createHome(name, homeName, player.getLocation());
+		// creating home
+		homeManager.createHome(player, homeName, player.getLocation());
 		messages.sendFormatted(player, "command.sethome.success", "%name%", homeName);
 		return;
 	}
@@ -62,7 +63,6 @@ public class CommandSethome extends OmnipotentCommand {
 	private int getHomesLimit(Player player) {
         int limit = player.getEffectivePermissions()
                 .parallelStream()
-                .filter(PermissionAttachmentInfo::getValue)
                 .map(PermissionAttachmentInfo::getPermission)
                 .filter(p -> p.startsWith("simplehomes.limit.multiple."))
                 .filter(p -> p.length() > 27)
@@ -70,7 +70,9 @@ public class CommandSethome extends OmnipotentCommand {
                 .map(this::getAsInteger)
                 .filter(i -> i != null)
                 .mapToInt(Integer::intValue)
+                .map(i -> 0 - i)
                 .sum();
+        
         return limit;
     }
     

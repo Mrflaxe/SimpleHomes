@@ -24,16 +24,22 @@ public class Home {
 	@DatabaseField
 	private String world;
 	@DatabaseField
+	private float yaw;
+	@DatabaseField
+	private float pitch;
+	@DatabaseField
 	private int x;
 	@DatabaseField
 	private int y;
 	@DatabaseField
 	private int z;
 	
-	public Home(String playerName, String homeName, String world, int x, int y, int z) {
+	public Home(String playerName, String homeName, String world, float yaw, float pitch, int x, int y, int z) {
 		this.playerName = playerName;
 		this.homeName = homeName;
 		this.world = world;
+		this.yaw = yaw;
+		this.pitch = pitch;
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -41,6 +47,6 @@ public class Home {
 	
 	public Location getLocation() {
 		World bukkitWorld = Bukkit.getWorld(world);
-		return bukkitWorld != null ? new Location(bukkitWorld, x + 0.5, y, z + 0.5) : null;
+		return bukkitWorld != null ? new Location(bukkitWorld, x + 0.5, y, z + 0.5, yaw, pitch) : null;
 	}
 }

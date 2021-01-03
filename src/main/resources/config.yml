@@ -17,3 +17,4 @@ database:
 homes:
   # 
   max-name-size: 32
+  min-name-size: 2

@@ -9,7 +9,7 @@ commands:
   simplehomes:
     aliases: [sh]
     description: using the subcommands
-    usage: /sh
+    usage: /simplehomes
   home:
     description: teleporting to a home point
     usage: /home [name]
@@ -19,4 +19,17 @@ commands:
   delhome:
     description: deletes a home point
     usage: /delhome [name]
+
+permissions:
+  simplehomes:
+    command:
+      sethome:
+        description: allow to set a home point
+        default: true
+      delhome:
+        description: allow to delete a home point
+        default: true
+      home:
+        description: allow to teleport to specific home point
+        default: true
 
