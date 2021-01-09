@@ -24,8 +24,6 @@ public class DatabaseManager {
 		this.homeDao = DaoManager.createDao(connection, Home.class);
 	}
 	
-	// Добавление в БД точки дома
-	
 	public void createHome(String playerName, String name, String world, float yaw, float pitch, int x, int y, int z) {
 		try {
 			Home home = new Home(playerName, name, world, yaw, pitch, x, y, z);
@@ -35,8 +33,6 @@ public class DatabaseManager {
 			return;
 		}
 	}
-	
-	// Удаление из БД точки дома
 	
 	public void deleteHome(String plyaerName, String name) {
 		Home home = getHome(plyaerName, name);
@@ -48,8 +44,6 @@ public class DatabaseManager {
 			return;
 		}
 	}
-	
-	// Получение объекта точки дома из БД по имени игрока и имени точки дома
 	
 	public Home getHome(String playerName, String homeName) {
 	    try {
@@ -63,11 +57,15 @@ public class DatabaseManager {
         }
 	}
 	
-	// Получение всех объектов существующих точек дома у определённго игрока
-	
+	/**
+	 * Returns a list with all homes that belong to a player
+	 * 
+	 * @param playerName - name of player
+	 * @return List of homes or null if happened an exception
+	 */
 	public List<Home> getHomesByPlayer(String playerName) {
 		try {
-			return homeDao.queryForEq("playerName", playerName);
+			return homeDao.queryForEq("player_name", playerName);
 		} catch (SQLException e) {
 			logger.severe("Failed to get homes by player's name from database: " + e.getMessage());
 			return null;

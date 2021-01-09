@@ -2,8 +2,8 @@ package ru.mrflaxe.simplehomes.commands;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.PermissionAttachmentInfo;
 
+import ru.mrflaxe.simplehomes.managers.GUIManager;
 import ru.mrflaxe.simplehomes.managers.HomeManager;
 import ru.soknight.lib.argument.CommandArguments;
 import ru.soknight.lib.command.preset.standalone.OmnipotentCommand;
@@ -15,13 +15,15 @@ public class CommandSethome extends OmnipotentCommand {
 	private final Messages messages;
 	private final Configuration config;
 	private final HomeManager homeManager;
+	private final GUIManager guiManager;
 	
-	public CommandSethome(Messages messages, Configuration config, HomeManager homeManager) {
+	public CommandSethome(Messages messages, Configuration config, HomeManager homeManager, GUIManager guiManager) {
 		super("sethome", null, "simplehomes.command.sethome", 1, messages);
 		
 		this.messages = messages;
 		this.config = config;
 		this.homeManager = homeManager;
+		this.guiManager = guiManager;
 	}
 
 	@Override
@@ -30,8 +32,8 @@ public class CommandSethome extends OmnipotentCommand {
 		
 		// Can a player make more homes than he has now?
 		int homeCount = homeManager.getHomeCount(player);
-		int homeLimit = getHomesLimit(player);
-		if(homeCount >= homeLimit) {
+		int homeLimit = guiManager.getHomesLimit(player);
+		if(homeCount >= homeLimit || homeCount >= 45) {
 			messages.getAndSend(sender, "command.sethome.error.limit-reached");
 			return;
 		}
@@ -59,29 +61,4 @@ public class CommandSethome extends OmnipotentCommand {
 		messages.sendFormatted(player, "command.sethome.success", "%name%", homeName);
 		return;
 	}
-	
-	private int getHomesLimit(Player player) {
-        int limit = player.getEffectivePermissions()
-                .parallelStream()
-                .map(PermissionAttachmentInfo::getPermission)
-                .filter(p -> p.startsWith("simplehomes.limit.multiple."))
-                .filter(p -> p.length() > 27)
-                .map(p -> p.substring(27))
-                .map(this::getAsInteger)
-                .filter(i -> i != null)
-                .mapToInt(Integer::intValue)
-                .map(i -> 0 - i)
-                .sum();
-        
-        return limit;
-    }
-    
-    private Integer getAsInteger(String source) {
-        try {
-            return Integer.parseInt(source);
-        } catch (NumberFormatException ignored) {
-            return null;
-        }
-    }
-
 }

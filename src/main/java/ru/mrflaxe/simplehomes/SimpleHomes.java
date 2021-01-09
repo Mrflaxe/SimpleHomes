@@ -8,6 +8,8 @@ import ru.mrflaxe.simplehomes.commands.CommandSethome;
 import ru.mrflaxe.simplehomes.commands.SubcommandHandler;
 import ru.mrflaxe.simplehomes.database.Database;
 import ru.mrflaxe.simplehomes.database.DatabaseManager;
+import ru.mrflaxe.simplehomes.listeners.InventoryActionListener;
+import ru.mrflaxe.simplehomes.managers.GUIManager;
 import ru.mrflaxe.simplehomes.managers.HomeManager;
 import ru.soknight.lib.configuration.Configuration;
 import ru.soknight.lib.configuration.Messages;
@@ -19,6 +21,7 @@ public class SimpleHomes extends JavaPlugin {
 	
 	private DatabaseManager databaseManager;
 	private HomeManager homeManager;
+	private GUIManager guiManager;
 	
 	@Override
 	public void onEnable() {
@@ -35,6 +38,9 @@ public class SimpleHomes extends JavaPlugin {
 		}
 		
 		this.homeManager = new HomeManager(databaseManager);
+		this.guiManager = new GUIManager(databaseManager, messages);
+		
+		new InventoryActionListener(messages, homeManager, guiManager).register(this);
 		
 		registerCommands();
 	}
@@ -43,15 +49,15 @@ public class SimpleHomes extends JavaPlugin {
 		this.config = new Configuration(this, "config.yml");
 		this.config.refresh();
 		
-		this.messages = new Messages(this, "messages");
+		this.messages = new Messages(this, "messages.yml");
 		this.messages.refresh();
 	}
 	
 	private void registerCommands() {
 	    new SubcommandHandler(this, messages);
 	    
-		new CommandHome(messages, homeManager).register(this);
-		new CommandSethome(messages, config, homeManager).register(this);
+		new CommandHome(messages, homeManager, guiManager).register(this);
+		new CommandSethome(messages, config, homeManager, guiManager).register(this);
 		new CommandDelhome(messages, homeManager).register(this);
 	}
 }

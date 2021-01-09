@@ -1,7 +1,7 @@
 main: ru.mrflaxe.simplehomes.SimpleHomes
-name: {project.name}
+name: ${project.name}
 author: mrflaxe
-version: {project.version}
+version: ${project.version}
 api-version: 1.16
 depend: [SKLibrary]
 
