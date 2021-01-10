@@ -33,10 +33,10 @@ public class CommandSethome extends OmnipotentCommand {
 		// Can a player make more homes than he has now?
 		int homeCount = homeManager.getHomeCount(player);
 		int homeLimit = guiManager.getHomesLimit(player);
-		if(homeCount >= homeLimit || homeCount >= 45) {
-			messages.getAndSend(sender, "command.sethome.error.limit-reached");
-			return;
-		}
+//		if(homeCount >= homeLimit || homeCount >= 45) {
+//			messages.getAndSend(sender, "command.sethome.error.limit-reached");
+//			return;
+//		}
 		
 		String homeName = args.get(0);
 		int length = homeName.length();

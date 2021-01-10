@@ -19,12 +19,14 @@ import ru.soknight.lib.configuration.Messages;
 public class GUIManager {
 
     private final List<String> browses;
+    private final List<String> changedMode;
     
     private final DatabaseManager dbManager;
     private final Messages messages;
     
     public GUIManager(DatabaseManager dbManager, Messages messages) {
         this.browses = new ArrayList<>();
+        this.changedMode = new ArrayList<>();
         
         this.dbManager = dbManager;
         this.messages = messages;
@@ -56,7 +58,7 @@ public class GUIManager {
         for(int i = 0; i < size; i++) {
             Home home = homes.get(i);
             
-            ItemStack item = chooseMaterial(home.getLocation());
+            ItemStack item = chooseMaterial(home);
             
             ItemMeta meta = item.getItemMeta();
             meta.setDisplayName("\u00a7e" + home.getHomeName());
@@ -74,8 +76,11 @@ public class GUIManager {
             menu.setItem(i, edging );
         }
         
+        
+        
+        // creating the sign with information about how many homes a player can create yet
         ItemStack limitItem = new ItemStack(Material.WARPED_SIGN);
-        ItemMeta meta = limitItem.getItemMeta();
+        ItemMeta limitMeta = limitItem.getItemMeta();
         
         int limit = getHomesLimit(player);
         
@@ -83,15 +88,38 @@ public class GUIManager {
         if(limit <= 0) name = messages.getColoredString("gui.limit.ended");
         else name = messages.getFormatted("gui.limit.free", "%count%", limit);
         
-        meta.setDisplayName(name);
-        limitItem.setItemMeta(meta);
+        limitMeta.setDisplayName(name);
+        limitItem.setItemMeta(limitMeta);
         
         menu.setItem(inventorySize - 5, limitItem);
+        
+        
+        
+        // creating button what will changing modes
+        ItemStack button = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
+        ItemMeta buttonMeta = button.getItemMeta();
+        
+        buttonMeta.setDisplayName(messages.getColoredString("gui.button.enable"));
+        button.setItemMeta(buttonMeta);
+        
+        menu.setItem(inventorySize - 9, button);
+        
+        
         
         return menu;
     }
     
-    private ItemStack chooseMaterial(Location location) {
+    private ItemStack chooseMaterial(Home home) {
+        Location location = home.getLocation();
+        String sMaterial = home.getMaterial();
+        
+        if(sMaterial != "default") {
+            Material material = Material.getMaterial(sMaterial);
+            if(material != null) {
+                return new ItemStack(material);
+            }
+        }
+        
         if(location.getBlockY() <= 30) return new ItemStack(Material.STONE);
         
         String world = location.getWorld().getName();
@@ -147,6 +175,18 @@ public class GUIManager {
         } catch (NumberFormatException ignored) {
             return null;
         }
+    }
+    
+    public void setChangedMode(Player player) {
+        changedMode.add(player.getName());
+    }
+    
+    public boolean isChangedMode(Player player) {
+        return changedMode.contains(player.getName());
+    }
+    
+    public void removeChangedMode (Player player) {
+        changedMode.remove(player.getName());
     }
 }
 

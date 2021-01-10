@@ -13,8 +13,14 @@ database:
   # SQLite configuration
   file: database.db
 
+# Настройка кулдауна
+cooldown:
+  # включить - true / выключить - false
+  enable: true
+  # Само кд команды (через какое время можно будет использовать команду повторно)
+  delay: 10 # (sec)
+
 # Конфигурация домов
 homes:
-  # 
   max-name-size: 32
   min-name-size: 2

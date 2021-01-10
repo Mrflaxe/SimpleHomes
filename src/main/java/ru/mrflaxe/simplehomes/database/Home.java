@@ -28,6 +28,8 @@ public class Home {
 	@DatabaseField
 	private float pitch;
 	@DatabaseField
+	private String material;
+	@DatabaseField
 	private int x;
 	@DatabaseField
 	private int y;
@@ -40,6 +42,7 @@ public class Home {
 		this.world = world;
 		this.yaw = yaw;
 		this.pitch = pitch;
+		this.material = "default";
 		this.x = x;
 		this.y = y;
 		this.z = z;

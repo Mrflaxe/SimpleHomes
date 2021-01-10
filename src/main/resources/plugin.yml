@@ -21,15 +21,19 @@ commands:
     usage: /delhome [name]
 
 permissions:
-  simplehomes:
-    command:
-      sethome:
-        description: allow to set a home point
-        default: true
-      delhome:
-        description: allow to delete a home point
-        default: true
-      home:
-        description: allow to teleport to specific home point
-        default: true
+  simplehomes.command.sethome:
+    description: allow to set a home point
+    default: true
+  simplehomes.command.delhome:
+    description: allow to delete a home point
+    default: true
+  simplehomes.command.home:
+    description: allow to teleport to specific home point
+    default: true
+  simplehomes.command.reload:
+    description: allow to refresh configs
+    default: op
+  simplehomes.command.help:
+    description: allow to get information about commands
+    default: true
 
