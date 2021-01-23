@@ -41,6 +41,10 @@ public class HomeManager {
 		        location.getBlockZ());
 	}
 	
+	public void refreshHome(Home home) {
+	    dbManager.refreshHome(home);
+	}
+	
 	public void deleteHome(Player player, String name) {
 	    dbManager.deleteHome(player.getName(), name);
 	}

@@ -34,6 +34,15 @@ public class DatabaseManager {
 		}
 	}
 	
+	
+	public void refreshHome(Home home) {
+	    try {
+            homeDao.update(home);
+        } catch (SQLException e) {
+            logger.severe("Failed to update the home data in database: " + e.getMessage());
+        }
+	}
+	
 	public void deleteHome(String plyaerName, String name) {
 		Home home = getHome(plyaerName, name);
 		

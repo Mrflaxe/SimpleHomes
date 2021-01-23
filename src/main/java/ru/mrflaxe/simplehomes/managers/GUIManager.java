@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -32,11 +31,19 @@ public class GUIManager {
         this.messages = messages;
     }
     
+    /**
+     * Opening the home menu with homes of current player
+     * @param player
+     */
     public void openMenu(Player player) {
         player.openInventory(initializeMenu(player));
         browses.add(player.getName());
     }
     
+    /**
+     * Removes the player from "browsing" list
+     * @param player
+     */
     public void removeBrowsing(Player player) {
         String name = player.getName();
         
@@ -44,9 +51,16 @@ public class GUIManager {
         browses.remove(name);
     }
     
+    /**
+     * Checks if the player browsing menu now
+     * @param player
+     * @return true if player browsing and false if not
+     */
     public boolean isBrowsing(Player player) {
         return browses.contains(player.getName());
     }
+    
+    // this method fils an inventory with homes of player and other items
     
     private Inventory initializeMenu(Player player) {
         List<Home> homes = dbManager.getHomesByPlayer(player.getName());
@@ -58,7 +72,8 @@ public class GUIManager {
         for(int i = 0; i < size; i++) {
             Home home = homes.get(i);
             
-            ItemStack item = chooseMaterial(home);
+            Material material = Material.getMaterial(home.getMaterial());
+            ItemStack item = new ItemStack(material);
             
             ItemMeta meta = item.getItemMeta();
             meta.setDisplayName("\u00a7e" + home.getHomeName());
@@ -89,6 +104,7 @@ public class GUIManager {
         else name = messages.getFormatted("gui.limit.free", "%count%", limit);
         
         limitMeta.setDisplayName(name);
+        limitMeta.setCustomModelData(1001);
         limitItem.setItemMeta(limitMeta);
         
         menu.setItem(inventorySize - 5, limitItem);
@@ -109,49 +125,6 @@ public class GUIManager {
         return menu;
     }
     
-    private ItemStack chooseMaterial(Home home) {
-        Location location = home.getLocation();
-        String sMaterial = home.getMaterial();
-        
-        if(sMaterial != "default") {
-            Material material = Material.getMaterial(sMaterial);
-            if(material != null) {
-                return new ItemStack(material);
-            }
-        }
-        
-        if(location.getBlockY() <= 30) return new ItemStack(Material.STONE);
-        
-        String world = location.getWorld().getName();
-        String biome = location.getBlock().getBiome().toString();
-        
-        if(world.equals("world")) {
-            if(biome.startsWith("MOUNTAIN") || biome.equals("GRAVELLY_MOUNTAINS") || biome.equals("STONE_SHORE")) return new ItemStack(Material.STONE);
-            if(biome.startsWith("BADLANDS") || biome.endsWith("BADLANDS_PLATEAU") || biome.equals("ERODED_BADLANDS")) return new ItemStack(Material.ORANGE_TERRACOTTA);
-            if(biome.startsWith("FROZEN") || biome.equals("ICE_SPIKES")) return new ItemStack(Material.ICE);
-            if(biome.startsWith("DEEP_") || biome.endsWith("OCEAN")) return new ItemStack(Material.BRAIN_CORAL);
-            if(biome.startsWith("JUNGLE") || biome.startsWith("BAMBOO")) return new ItemStack(Material.JUNGLE_LOG);
-            if(biome.startsWith("DESERT") || biome.equals("BEACH")) return new ItemStack(Material.SAND);
-            if(biome.startsWith("BRICH") || biome.startsWith("TALL")) return new ItemStack(Material.BIRCH_LOG);
-            if(biome.startsWith("TAIGA") || biome.startsWith("GIANT")) return new ItemStack(Material.SPRUCE_LOG);
-            if(biome.startsWith("SAVANNA") || biome.startsWith("SHATTERED")) return new ItemStack(Material.ACACIA_LOG);
-            if(biome.startsWith("SNOWY")) return new ItemStack(Material.SNOW_BLOCK);
-            if(biome.startsWith("SWAMP")) return new ItemStack(Material.LILY_PAD);
-            if(biome.startsWith("DARK")) return new ItemStack(Material.DARK_OAK_LOG);
-        }
-        
-        if(world.equals("world_nether")) {
-            if(biome.startsWith("BASALT")) return new ItemStack(Material.BASALT);
-            if(biome.startsWith("CRIMSON")) return new ItemStack(Material.CRIMSON_STEM);
-            if(biome.startsWith("SOUL")) return new ItemStack(Material.SOUL_SAND);
-            if(biome.startsWith("WARPED")) return new ItemStack(Material.WARPED_STEM);
-            return new ItemStack(Material.NETHERRACK);
-        }
-        
-        if(world.equals("world_the_end")) return new ItemStack(Material.END_STONE);
-        
-        return new ItemStack(Material.GRASS_BLOCK);
-    }
     
     public int getHomesLimit(Player player) {
         int limit = player.getEffectivePermissions()
@@ -177,14 +150,27 @@ public class GUIManager {
         }
     }
     
+    /**
+     * Adds the player to changeMode list
+     * @param player
+     */
     public void setChangedMode(Player player) {
         changedMode.add(player.getName());
     }
     
+    /**
+     * checks if the player contains in changeMode list
+     * @param player
+     * @return true if contains and false if not
+     */
     public boolean isChangedMode(Player player) {
         return changedMode.contains(player.getName());
     }
     
+    /**
+     * removes the player from changeMode list
+     * @param player
+     */
     public void removeChangedMode (Player player) {
         changedMode.remove(player.getName());
     }
