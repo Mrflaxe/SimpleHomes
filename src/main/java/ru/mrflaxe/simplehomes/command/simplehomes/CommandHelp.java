@@ -1,12 +1,12 @@
-package ru.mrflaxe.simplehomes.commands.sub;
+package ru.mrflaxe.simplehomes.command.simplehomes;
 
 import ru.soknight.lib.command.enhanced.help.command.EnhancedHelpExecutor;
 import ru.soknight.lib.command.response.CommandResponseType;
 import ru.soknight.lib.configuration.Messages;
 
-public class SubcommandHelp extends EnhancedHelpExecutor {
+public class CommandHelp extends EnhancedHelpExecutor {
 
-    public SubcommandHelp(Messages messages) {
+    public CommandHelp(Messages messages) {
         super(messages);
         
         super.setHeaderFrom("help.header");
@@ -22,23 +22,36 @@ public class SubcommandHelp extends EnhancedHelpExecutor {
                     .descriptionFrom("help")
                     .permission("help")
                     .add()
+             
+            // /home [name]
+            .newLine()
+                    .command("home", true)
+                    .argumentFrom("name")
+                    .add()
+                    
+            // /homes [player] [page]
+            .newLine()
+                    .command("homes", true)
+                    .argumentsFrom("player", "page")
+                    .add()
             
             // /sethome <name>
             .newLine()
                     .command("sethome", true)
-                    .argumentsFrom("home-name")
-                    .add()
-             
-            // /home <name>
-            .newLine()
-                    .command("home", true)
-                    .argumentsFrom("home-name")
+                    .argumentFrom("name")
                     .add()
             
             // /delhome <name>
             .newLine()
                     .command("delhome", true)
-                    .argumentsFrom("home-name")
+                    .argumentFrom("name")
+                    .add()
+                    
+            // /simplehomes reload
+            .newLine()
+                    .command("simplehomes reload")
+                    .descriptionFrom("reload")
+                    .permission("reload")
                     .add();
         
         super.completeMessage();

@@ -1,16 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>ru.mrflaxe</groupId>
     <artifactId>simplehomes</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.3</version>
   
     <name>SimpleHomes</name>
-    <description>Plugin for Minecraft</description>
+    <description>Just another homes system plugin for the Minecraft</description>
   
     <properties>
+        <!-- Building -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Dependencies -->
+        <spigot.api.version>1.16.5-R0.1-SNAPSHOT</spigot.api.version>
+        <sklibrary.version>1.13.3</sklibrary.version>
+        <lombok.version>1.18.20</lombok.version>
     </properties>   
     
     <repositories>
@@ -18,38 +25,36 @@
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
-        
         <repository>
-            <id>SKLibrary-mvn-repo</id>
-            <url>https://github.com/SoKnight/SKLibrary/raw/mvn-repo/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
     
     <dependencies>
+        <!-- Spigot API -->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.16.2-R0.1-SNAPSHOT</version>
+            <version>${spigot.api.version}</version>
             <scope>provided</scope>
         </dependency>
-        
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
-            <scope>provided</scope>
-        </dependency>   
-        
+
+        <!-- SKLibrary -->
         <dependency>
             <groupId>ru.soknight</groupId>
             <artifactId>sklibrary</artifactId>
-            <version>1.9.0</version>
+            <version>${sklibrary.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>  
     </dependencies>
     
     <build>

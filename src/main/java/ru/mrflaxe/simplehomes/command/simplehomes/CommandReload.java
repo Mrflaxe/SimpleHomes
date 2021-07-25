@@ -1,30 +1,29 @@
-package ru.mrflaxe.simplehomes.commands.sub;
+package ru.mrflaxe.simplehomes.command.simplehomes;
 
 import org.bukkit.command.CommandSender;
 
+import ru.mrflaxe.simplehomes.SimpleHomes;
 import ru.soknight.lib.argument.CommandArguments;
 import ru.soknight.lib.command.preset.subcommand.PermissibleSubcommand;
-import ru.soknight.lib.configuration.Configuration;
 import ru.soknight.lib.configuration.Messages;
 
-public class SubcommandReload extends PermissibleSubcommand {
+public class CommandReload extends PermissibleSubcommand {
     
+    private final SimpleHomes plugin;
     private final Messages messages;
-    private final Configuration config;
     
-    public SubcommandReload(Messages messages, Configuration config) {
+    public CommandReload(SimpleHomes plugin, Messages messages) {
         super("simplehomes.command.reload", messages);
         
+        this.plugin = plugin;
         this.messages = messages;
-        this.config = config;
     }
 
     @Override
     protected void executeCommand(CommandSender sender, CommandArguments args) {
-        messages.refresh();
-        config.refresh();
+        plugin.reload();
         
-        messages.getAndSend(sender, "command.reload.success");
+        messages.getAndSend(sender, "reload-success");
     }
 
 }

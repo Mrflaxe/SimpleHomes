@@ -1,83 +1,84 @@
 package ru.mrflaxe.simplehomes.database;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
+
+import org.bukkit.plugin.Plugin;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 
-import ru.mrflaxe.simplehomes.SimpleHomes;
+import ru.mrflaxe.simplehomes.database.model.HomeModel;
+import ru.soknight.lib.database.Database;
+import ru.soknight.lib.executable.quiet.AbstractQuietExecutor;
+import ru.soknight.lib.executable.quiet.ThrowableHandler;
 
-public class DatabaseManager {
+public final class DatabaseManager extends AbstractQuietExecutor {
 
-	private final Logger logger;
-	private final ConnectionSource connection;
+    private final ConnectionSource connection;
+	private final Dao<HomeModel, String> homesDao;
 	
-	private final Dao<Home, String> homeDao;
-	
-	public DatabaseManager(SimpleHomes plugin, Database database) throws SQLException {
-		logger = plugin.getLogger();
-		connection = database.getConnection();
-		
-		this.homeDao = DaoManager.createDao(connection, Home.class);
+	public DatabaseManager(Plugin plugin, Database database) throws SQLException {
+        super(ThrowableHandler.createForDatabase(plugin));
+
+		this.connection = database.establishConnection();
+		this.homesDao = DaoManager.createDao(connection, HomeModel.class);
 	}
 	
-	public void createHome(String playerName, String name, String world, float yaw, float pitch, int x, int y, int z) {
-		try {
-			Home home = new Home(playerName, name, world, yaw, pitch, x, y, z);
-			homeDao.create(home);
-		} catch (SQLException e) {
-			logger.severe("Failed to create the home data in database: " + e.getMessage());
-			return;
-		}
+	public void shutdown() {
+        try {
+            if(connection != null)
+                connection.close();
+        } catch (IOException ignored) {}
+    }
+	
+	public CompletableFuture<HomeModel> getHome(String holder, String homeName) {
+	    return supplyQuietlyAsync(() -> homesDao.queryBuilder().where()
+                .eq("holder", holder).and()
+                .eq("home_name", homeName)
+                .queryForFirst()
+        );
+    }
+	
+	public CompletableFuture<HomeModel> getFirstHome(String holder) {
+        return supplyQuietlyAsync(() -> homesDao.queryBuilder().where()
+                .eq("holder", holder)
+                .queryForFirst()
+        );
+    }
+    
+    public CompletableFuture<List<HomeModel>> getHomes(String holder) {
+        return supplyQuietlyAsync(() -> homesDao.queryBuilder().where()
+                .eq("holder", holder)
+                .query()
+        );
+    }
+    
+    public CompletableFuture<Long> getHomesAmount(String holder) {
+        return supplyQuietlyAsync(() -> homesDao.queryBuilder().where()
+                .eq("holder", holder)
+                .countOf()
+        );
+    }
+    
+    public CompletableFuture<Boolean> hasHome(String holder, String homeName) {
+        return supplyQuietlyAsync(() -> homesDao.queryBuilder().where()
+                .eq("holder", holder).and()
+                .eq("home_name", homeName)
+                .countOf() != 0L
+        );
+    }
+	
+	public CompletableFuture<Void> removeHome(HomeModel home) {
+        return runQuietlyAsync(() -> homesDao.delete(home));
 	}
 	
-	
-	public void refreshHome(Home home) {
-	    try {
-            homeDao.update(home);
-        } catch (SQLException e) {
-            logger.severe("Failed to update the home data in database: " + e.getMessage());
-        }
+	public CompletableFuture<Void> saveHome(HomeModel home) {
+        return runQuietlyAsync(() -> homesDao.createOrUpdate(home));
 	}
-	
-	public void deleteHome(String plyaerName, String name) {
-		Home home = getHome(plyaerName, name);
-		
-		try {
-			homeDao.delete(home);
-		} catch (SQLException e) {
-			logger.severe("Failed to delete a home data in database: " + e.getMessage());
-			return;
-		}
-	}
-	
-	public Home getHome(String playerName, String homeName) {
-	    try {
-            return homeDao.queryBuilder().where()
-                        .eq("player_name", playerName).and()
-                        .eq("home_name", homeName)
-                        .queryForFirst();
-        } catch (Exception ex) {
-            
-            return null;
-        }
-	}
-	
-	/**
-	 * Returns a list with all homes that belong to a player
-	 * 
-	 * @param playerName - name of player
-	 * @return List of homes or null if happened an exception
-	 */
-	public List<Home> getHomesByPlayer(String playerName) {
-		try {
-			return homeDao.queryForEq("player_name", playerName);
-		} catch (SQLException e) {
-			logger.severe("Failed to get homes by player's name from database: " + e.getMessage());
-			return null;
-		}
-	}
+
 }

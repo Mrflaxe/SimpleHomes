@@ -1,26 +1,58 @@
+#
+#    
+#     ██████╗██╗███╗   ███╗██████╗ ██╗     ███████╗  ██╗  ██╗ █████╗ ███╗   ███╗███████╗ ██████╗
+#    ██╔════╝██║████╗ ████║██╔══██╗██║     ██╔════╝  ██║  ██║██╔══██╗████╗ ████║██╔════╝██╔════╝
+#    ╚█████╗ ██║██╔████╔██║██████╔╝██║     █████╗    ███████║██║  ██║██╔████╔██║█████╗  ╚█████╗ 
+#     ╚═══██╗██║██║╚██╔╝██║██╔═══╝ ██║     ██╔══╝    ██╔══██║██║  ██║██║╚██╔╝██║██╔══╝   ╚═══██╗
+#    ██████╔╝██║██║ ╚═╝ ██║██║     ███████╗███████╗  ██║  ██║╚█████╔╝██║ ╚═╝ ██║███████╗██████╔╝
+#    ╚═════╝ ╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝  ╚═╝  ╚═╝ ╚════╝ ╚═╝     ╚═╝╚══════╝╚═════╝ 
+#
+#    Original author & developer: MrFlaxe
+#    Contributor: SoKnight
+#
+#
+# Database configuration
 database:
-  # Should plugin use SQLite database as data storage?
-  # Specify 'true' for SQLite or 'false' for MySQL
-  use-sqlite: true
+  # Database connection type
+  # Supported: [mysql, sqlite, postgresql]
+  type: sqlite
 
-  # MySQL configuration
-  host: localhost
-  port: 3306
-  name: simplehomes
-  user: admin
-  password: simplehomes
+  # MySQL connection configuration
+  mysql:
+    host: localhost
+    port: 3306
+    name: simplehomes
+    user: admin
+    password: simplehomes
+    params:
+    - 'autoReconnect=true'
+    - 'useSSL=false'
 
-  # SQLite configuration
-  file: database.db
+  # PostgreSQL connection configuration
+  postgresql:
+    host: localhost
+    port: 5432
+    name: simplehomes
+    user: admin
+    password: simplehomes
+    params:
+    - 'autoReconnect=true'
+    - 'useSSL=false'
 
-# Настройка кулдауна
+  # SQLite connection configuration
+  sqlite:
+    file: database.db
+
+# Cooldown configuration
 cooldown:
-  # включить - true / выключить - false
   enable: true
-  # Само кд команды (через какое время можно будет использовать команду повторно)
-  delay: 10 # (sec)
+  
+  # Cooldown delay
+  # Specify value in SECONDS here
+  delay: 10
 
-# Конфигурация домов
+# Homes configuration
 homes:
-  max-name-size: 32
-  min-name-size: 2
+  # Minimal and maximal length of the home name
+  max-name-length: 32
+  min-name-length: 2

@@ -1,82 +1,88 @@
-package ru.mrflaxe.simplehomes.managers;
+package ru.mrflaxe.simplehomes.menu;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.permissions.PermissionAttachmentInfo;
-
+import ru.mrflaxe.simplehomes.common.HomesLimitFetcher;
 import ru.mrflaxe.simplehomes.database.DatabaseManager;
-import ru.mrflaxe.simplehomes.database.Home;
+import ru.mrflaxe.simplehomes.database.model.HomeModel;
 import ru.soknight.lib.configuration.Messages;
 
-public class GUIManager {
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-    private final List<String> browses;
-    private final List<String> changedMode;
+public class GUIManager {
     
-    private final DatabaseManager dbManager;
     private final Messages messages;
+    private final DatabaseManager databaseManager;
+
+    private final Set<Player> browses;
+    private final Set<Player> editorMode;
     
-    public GUIManager(DatabaseManager dbManager, Messages messages) {
-        this.browses = new ArrayList<>();
-        this.changedMode = new ArrayList<>();
-        
-        this.dbManager = dbManager;
+    public GUIManager(Messages messages, DatabaseManager dbManager) {
         this.messages = messages;
+        this.databaseManager = dbManager;
+        
+        this.browses = new HashSet<>();
+        this.editorMode = new HashSet<>();
+    }
+    
+    public void closeAll() {
+        if(!browses.isEmpty())
+            browses.forEach(Player::closeInventory);
+        
+        browses.clear();
+        editorMode.clear();
     }
     
     /**
      * Opening the home menu with homes of current player
-     * @param player
+     * @param player target player
      */
     public void openMenu(Player player) {
         player.openInventory(initializeMenu(player));
-        browses.add(player.getName());
+        browses.add(player);
     }
     
     /**
      * Removes the player from "browsing" list
-     * @param player
+     * @param player target player
      */
     public void removeBrowsing(Player player) {
-        String name = player.getName();
-        
-        if(!browses.contains(name)) return;
-        browses.remove(name);
+        browses.remove(player);
     }
     
     /**
      * Checks if the player browsing menu now
-     * @param player
+     * @param player target player
      * @return true if player browsing and false if not
      */
     public boolean isBrowsing(Player player) {
-        return browses.contains(player.getName());
+        return browses.contains(player);
     }
     
     // this method fils an inventory with homes of player and other items
-    
     private Inventory initializeMenu(Player player) {
-        List<Home> homes = dbManager.getHomesByPlayer(player.getName());
-        int size = homes.size();
+        List<HomeModel> homeModels = databaseManager.getHomes(player.getName()).join();
+        
+        int size = homeModels.size();
         int inventorySize = ((size - 1)/9 + 2) * 9;
         
         Inventory menu = Bukkit.createInventory(player, inventorySize, messages.getColoredString("gui.title"));
         
         for(int i = 0; i < size; i++) {
-            Home home = homes.get(i);
+            HomeModel homeModel = homeModels.get(i);
             
-            Material material = Material.getMaterial(home.getMaterial());
+            Material material = homeModel.getMaterial();
             ItemStack item = new ItemStack(material);
             
             ItemMeta meta = item.getItemMeta();
-            meta.setDisplayName("\u00a7e" + home.getHomeName());
+            meta.setDisplayName(ChatColor.GREEN + homeModel.getHomeName());
             item.setItemMeta(meta);
             
             menu.setItem(i, item);
@@ -91,17 +97,15 @@ public class GUIManager {
             menu.setItem(i, edging );
         }
         
-        
-        
         // creating the sign with information about how many homes a player can create yet
         ItemStack limitItem = new ItemStack(Material.WARPED_SIGN);
         ItemMeta limitMeta = limitItem.getItemMeta();
         
-        int limit = getHomesLimit(player);
+        int limit = HomesLimitFetcher.getHomesLimit(player);
         
         String name;
-        if(limit <= 0) name = messages.getColoredString("gui.limit.ended");
-        else name = messages.getFormatted("gui.limit.free", "%count%", limit);
+        if(limit <= 0) name = messages.getColoredString("gui.counter.unavailable");
+        else name = messages.getFormatted("gui.counter.available", "%count%", limit);
         
         limitMeta.setDisplayName(name);
         limitMeta.setCustomModelData(1001);
@@ -109,70 +113,40 @@ public class GUIManager {
         
         menu.setItem(inventorySize - 5, limitItem);
         
-        
-        
         // creating button what will changing modes
         ItemStack button = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
         ItemMeta buttonMeta = button.getItemMeta();
         
-        buttonMeta.setDisplayName(messages.getColoredString("gui.button.enable"));
+        buttonMeta.setDisplayName(messages.getColoredString("gui.editor.tip.enable"));
         button.setItemMeta(buttonMeta);
         
         menu.setItem(inventorySize - 9, button);
-        
-        
-        
         return menu;
-    }
-    
-    
-    public int getHomesLimit(Player player) {
-        int limit = player.getEffectivePermissions()
-                .parallelStream()
-                .map(PermissionAttachmentInfo::getPermission)
-                .filter(p -> p.startsWith("simplehomes.limit.multiple."))
-                .filter(p -> p.length() > 27)
-                .map(p -> p.substring(27))
-                .map(this::getAsInteger)
-                .filter(i -> i != null)
-                .mapToInt(Integer::intValue)
-                .map(i -> 0 - i)
-                .sum();
-        
-        return limit;
-    }
-    
-    private Integer getAsInteger(String source) {
-        try {
-            return Integer.parseInt(source);
-        } catch (NumberFormatException ignored) {
-            return null;
-        }
     }
     
     /**
      * Adds the player to changeMode list
-     * @param player
+     * @param player target player
      */
-    public void setChangedMode(Player player) {
-        changedMode.add(player.getName());
+    public void setEditorMode(Player player) {
+        editorMode.add(player);
     }
     
     /**
-     * checks if the player contains in changeMode list
-     * @param player
+     * Checks if the player contains in changeMode list
+     * @param player target player
      * @return true if contains and false if not
      */
-    public boolean isChangedMode(Player player) {
-        return changedMode.contains(player.getName());
+    public boolean isEditorMode(Player player) {
+        return editorMode.contains(player);
     }
     
     /**
-     * removes the player from changeMode list
-     * @param player
+     * Removes the player from changeMode list
+     * @param player target player
      */
-    public void removeChangedMode (Player player) {
-        changedMode.remove(player.getName());
+    public void removeEditorMode(Player player) {
+        editorMode.remove(player);
     }
 }
 

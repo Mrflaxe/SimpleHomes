@@ -1,39 +1,66 @@
 main: ru.mrflaxe.simplehomes.SimpleHomes
 name: ${project.name}
-author: mrflaxe
 version: ${project.version}
-api-version: 1.16
+authors: [mrflaxe, SoKnight]
 depend: [SKLibrary]
+api-version: 1.13
+description: ${project.description}
 
 commands:
   simplehomes:
     aliases: [sh]
-    description: using the subcommands
-    usage: /simplehomes
+    description: main plugin command
+    usage: /simplehomes help
   home:
     description: teleporting to a home point
     usage: /home [name]
+  homes:
+    description: displays all available homes
+    usage: /homes [player] [page]
   sethome:
     description: sets a home point
-    usage: /sethome [name]
+    usage: /sethome <name>
   delhome:
     description: deletes a home point
-    usage: /delhome [name]
+    usage: /delhome <name>
 
 permissions:
-  simplehomes.command.sethome:
-    description: allow to set a home point
-    default: true
-  simplehomes.command.delhome:
-    description: allow to delete a home point
-    default: true
-  simplehomes.command.home:
-    description: allow to teleport to specific home point
-    default: true
-  simplehomes.command.reload:
-    description: allow to refresh configs
-    default: op
   simplehomes.command.help:
     description: allow to get information about commands
     default: true
 
+  simplehomes.command.home:
+    description: allow to teleport to specific own home
+    default: true
+
+  simplehomes.command.home.other:
+    description: allow to teleport to specific other player's home
+    default: op
+
+  simplehomes.command.homes:
+    description: allow to see own homes list
+    default: true
+
+  simplehomes.command.homes.other:
+    description: allow to see other player's homes list
+    default: op
+
+  simplehomes.command.sethome:
+    description: allow to set a home point
+    default: true
+
+  simplehomes.command.delhome:
+    description: allow to delete a home point
+    default: true
+
+  simplehomes.command.reload:
+    description: allow to refresh configs
+    default: op
+
+  simplehomes.limit.unlimited:
+    description: allow to bypass the homes limit restriction
+    default: op
+
+  simplehomes.bypass.cooldown:
+    description: allow to bypass /home command cooldown
+    default: op
